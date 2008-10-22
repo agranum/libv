@@ -234,7 +234,7 @@ int net_recv(net *n)
 	chunk *c;
 
 	errno = 0;
-	num = recv(n->sockfd, buf, NET_MAXDATASIZE - 1, MSG_DONTWAIT);
+	num = recv(n->sockfd, buf, NET_MAXDATASIZE - 1, 0);
 	buf[num] = '\0';
 
 	if(errno == EAGAIN)
