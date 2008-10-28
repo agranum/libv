@@ -23,9 +23,19 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STRING_H_
-#define STRING_H_
 
-#define WHITESPACES " \t\n\r\x0B\0"
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <string.h>
+#include <ctype.h>
+#include "file.h"
 
-#endif  /* ! STRING_H_ */
+
+
+int main()
+{
+
+	return(0);
+}
+

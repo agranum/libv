@@ -23,9 +23,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STRING_H_
-#define STRING_H_
+#ifndef FILE_H_
+#define FILE_H_
 
-#define WHITESPACES " \t\n\r\x0B\0"
 
-#endif  /* ! STRING_H_ */
+#endif  /* ! FILE_H_ */
