@@ -26,5 +26,7 @@
 #ifndef FILE_H_
 #define FILE_H_
 
+char *file_read_line(FILE *fp);
+char **file_read(FILE *fp);
 
 #endif  /* ! FILE_H_ */

@@ -258,37 +258,6 @@ void par_free(char ***par)
 	*par = NULL;
 }
 
-
-/*
-char **explode(const char *s, int c)
-{
-	char **par = NULL, *tmp;
-	size_t start = 0, i;
-
-	if(s == NULL)
-		return NULL;
-
-	for(i = 0; i <= strlen(s); i++) {
-		if((s[i] == c) || (s[i] == '\0')) {
-			tmp = substr(s, start, i - start);
-
-			if(tmp == NULL) {
-				par_free(&par);
-				return NULL;
-			}
-
-			if(par_add(&par, tmp) < 0) {
-				par_free(&par);
-				return NULL;
-			}
-			start = i + 1;
-		}
-	}
-
-	return(par);
-}
-*/
-
 void explode_r(char **a, char *p, const char *str, const char *delim)
 {
 	size_t pos, len_d, i = 0;
@@ -313,7 +282,7 @@ void explode_r(char **a, char *p, const char *str, const char *delim)
 	a[i] = NULL;
 }
 
-char **explode(char *str, char *delim)
+char **explode(const char *str, const char *delim)
 {
 	size_t len, size;
 	char *s, **p;
@@ -344,23 +313,40 @@ void printstring(void *s)
 	printf("---%s---\n", (char *)s);
 }
 
-
-int main()
+int isint(const char *str)
 {
-	char **tok = NULL;
-	char *p;
-	char buf[] = "whihihi foodu wsnafu tralala xfooyw";
-	int i;
+	char *p = (char *)str;
 
-	tok = explode("xxxfoo barxxxtralalaxxxxxx", "xxx");
+	if(p == NULL)
+		return 0;
 
-	par_foreach(&tok, printstring);
+	while(*p) {
+		if(!isdigit(*p)) {
+			if(p != str)
+				return 0;
 
-	return(0);
+			if((*p != '+') && (*p != '-'))
+				return 0;
+		}
 
-	p = substr_replace(buf, "", "");
-	printf("string: %s\nresult: %s\n", buf, p);
+		p++;
+	}
 
-	return(0);
+	if(str == p)
+		return 0;
+
+	return 1;
+}
+
+void str_unify(char *s, const char *chrs, int c)
+{
+	char *p = s;
+
+	while(p && *p) {
+		if(strchr(chrs, *p) != NULL)
+			*p = c;
+
+		++p;
+	}
 }
 

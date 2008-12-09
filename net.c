@@ -325,8 +325,6 @@ static void net_queue_size(net *n)
 int main(int argc, char *argv[])
 {
 	net *n;
-	node_l *tmp;
-	chunk *c;
 	char *msg = "GET /search?hl=de&q=%22meine+oma+f%C3%A4hrt+im+h%C3%BChnerstall+motorrad%22&btnG=Suche&meta= HTTP/1.0\n\n";
 	//char *msg = "GET /index.php HTTP/1.0\n\n";
 

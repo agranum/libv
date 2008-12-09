@@ -89,31 +89,14 @@ static const int freqs[3][3] = {
 	}
 };
 
+static unsigned long int own_ntohl(unsigned long int in);
+static unsigned long int mpeg_seek_nextheader(FILE *fp);
+
 
 /* our own ntohl() implementation for strict ANSI compliance */
 #ifndef ntohl
 	#define ntohl own_ntohl
 #endif
-
-static unsigned long int own_ntohl(unsigned long int in)
-{
-	unsigned char a[4], t;
-
-	memcpy(a, &in, 4);
-
-	t = a[3];
-	a[3] = a[0];
-	a[0] = t;
-
-	t = a[2];
-	a[2] = a[1];
-	a[1] = t;
-
-	memcpy(&in, a, 4);
-
-	return in;
-}
-
 
 int mpeg_read(const char *path_, struct mpeg *mpeg_)
 {
@@ -124,7 +107,7 @@ int mpeg_read(const char *path_, struct mpeg *mpeg_)
 		return(-1);
 	}
 
-	if((header = mpeg_seek_nextheader_(fp)) == (unsigned long int)-1) {
+	if((header = mpeg_seek_nextheader(fp)) == (unsigned long int)-1) {
 		return(-1);
 	}
 
@@ -136,29 +119,12 @@ int mpeg_read(const char *path_, struct mpeg *mpeg_)
 	return(0);
 }
 
-unsigned long int mpeg_seek_nextheader_(FILE *fp_)
-{
-	unsigned long int header;
-	int c;
-
-	while((c = fgetc(fp_)) != 0xff && c != EOF);
-
-	if (feof(fp_))
-		return(-1);
-
-	ungetc(c, fp_);
-	fread(&header, 1, sizeof(header), fp_);
-	header = ntohl(header);
-
-	return(header);
-}
-
 int mpeg_extract_info(unsigned long int header_, struct mpeg *mpeg_)
 {
 	if ((header_ & MASK_SYNC) != MASK_SYNC)
 		return(-1);
 
-	mpeg_->mpeg_version = ((header_ & MASKmpeg_) >> SHIFTmpeg_);
+	mpeg_->mpeg_version = ((header_ & MASK_MPEG) >> SHIFT_MPEG);
 
 	mpeg_->layer_desc = ((header_ & MASK_LAYER) >> SHIFT_LAYER);
 
@@ -211,8 +177,8 @@ size_t mpeg_frame_bytes(struct mpeg *mpeg_)
 
 void mpeg_print(struct mpeg *mpeg_)
 {
-	float ver;
-	int layer;
+	float ver = 0;
+	int layer = 0;
 	const char *layers[] = {"I", "II", "III"};
 	const char *chan_modes[] = {
 		"Stereo",
@@ -273,6 +239,43 @@ void mpeg_print(struct mpeg *mpeg_)
 	printf("Original media:\t%s\n", mpeg_->bit_orig?"yes":"no");
 	
 	printf("Frame size:\t%d slots (%d bytes)\n", mpeg_frame_length(mpeg_), mpeg_frame_bytes(mpeg_));
+}
+
+
+static unsigned long int own_ntohl(unsigned long int in)
+{
+	unsigned char a[4], t;
+
+	memcpy(a, &in, 4);
+
+	t = a[3];
+	a[3] = a[0];
+	a[0] = t;
+
+	t = a[2];
+	a[2] = a[1];
+	a[1] = t;
+
+	memcpy(&in, a, 4);
+
+	return in;
+}
+
+static unsigned long int mpeg_seek_nextheader(FILE *fp)
+{
+	unsigned long int header;
+	int c;
+
+	while((c = fgetc(fp)) != 0xff && c != EOF);
+
+	if (feof(fp))
+		return(-1);
+
+	ungetc(c, fp);
+	fread(&header, 1, sizeof(header), fp);
+	header = ntohl(header);
+
+	return(header);
 }
 
 int main(int argc, char *argv[])

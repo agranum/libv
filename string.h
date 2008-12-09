@@ -26,6 +26,30 @@
 #ifndef STRING_H_
 #define STRING_H_
 
-#define WHITESPACES " \t\n\r\x0B\0"
+char *ltrim(char *const s);
+char *rtrim(char *const s);
+char *trim(char *const s);
+char *substr(const char *s, size_t start, size_t len);
+size_t substr_count(const char *haystack, const char *needle);
+size_t substr_replace_compute_size(const char *haystack,
+				   const char *needle,
+				   const char *replace);
+int substr_index(size_t *pos, const char *haystack, const char *needle);
+void substr_replace_r(      char *s, 
+		      const char *haystack, 
+		      const char *needle, 
+		      const char *replace);
+char *substr_replace(const char *haystack,
+		     const char *needle, 
+		     const char *replace);
+size_t par_size(char ***par);
+int par_add(char ***par, const char *s);
+void par_foreach(char ***par, void func(void *));
+void par_free(char ***par);
+void explode_r(char **a, char *p, const char *str, const char *delim);
+char **explode(const char *str, const char *delim);
+void printstring(void *s);
+int isint(const char *str);
+void str_unify(char *s, const char *chrs, int c);
 
 #endif  /* ! STRING_H_ */
