@@ -28,14 +28,58 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include <ctype.h>
 #include "file.h"
 
 
-
-int main()
+char *file_read_line(FILE *fp)
 {
+	char *ret = NULL;
+	int c;
+	size_t i = 0;
 
-	return(0);
+	assert(fp != NULL);
+
+	while((c = fgetc(fp)) != EOF) {
+		i++;
+		ret = realloc(ret, i + 1);
+		if(ret == NULL)
+			return(NULL);
+
+		ret[i - 1] = c;
+
+		if(c == '\n') break;
+	}
+
+	if(i)
+		ret[i] = '\0';
+
+	return(ret);
+}
+
+
+char **file_read(FILE *fp)
+{
+	char **ret = NULL;
+	char *line;
+	size_t i = 0;
+
+	assert(fp != NULL);
+
+	while((line = file_read_line(fp)) != NULL) {
+		i++;
+		ret = realloc(ret, sizeof(*ret) * i);
+		if(ret == NULL)
+			return(NULL);
+
+		ret[i - 1] = line;
+	}
+
+	ret = realloc(ret, sizeof(*ret) * (i + 1));
+	if(ret == NULL)
+		return(NULL);
+
+	ret[i] = NULL;
+
+	return(ret);
 }
 
