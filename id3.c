@@ -29,39 +29,39 @@
 #include <stdlib.h>
 #include "id3.h"
 
-int id3_read(const char *_path, struct id3 *_id3)
+int id3_read(const char *path, struct id3 *id3)
 {
 	char tmp[TAG_LENGTH];
 
-	assert(_path != NULL);
-	assert(_id3 != NULL);
+	assert(path != NULL);
+	assert(id3 != NULL);
 
-	if(id3_read_tag(_path, tmp) < 0)
+	if(id3_read_tag(path, tmp) < 0)
 	        return(-1);
 
 	if(id3_check_tag(tmp) < 0)
 	        return(-1);
 
-	if(id3_extract_info(tmp, _id3) < 0)
+	if(id3_extract_info(tmp, id3) < 0)
 	        return(-1);
 
-	id3_normalize_info(_id3);
+	id3_normalize_info(id3);
 
 	return(0);
 }
 
-int id3_write(const char *_path, struct id3 *_id3)
+int id3_write(const char *path, struct id3 *id3)
 {
 	struct id3 tmp;
 	FILE *fp;
 
-	assert(_id3 != NULL);
-	assert(_path != NULL);
+	assert(id3 != NULL);
+	assert(path != NULL);
 
-	if((fp = fopen(_path, "r+")) == NULL)
+	if((fp = fopen(path, "r+")) == NULL)
 	        return(-1);
 
-	if(id3_read(_path, &tmp) == 0) {
+	if(id3_read(path, &tmp) == 0) {
 		if(fseek(fp, -1 * TAG_LENGTH, SEEK_END) == -1)
 		        return(-1);
 	} else {
@@ -69,46 +69,46 @@ int id3_write(const char *_path, struct id3 *_id3)
 		        return(-1);
 	}
 
-        id3_write_tag(fp, _id3);
+        id3_write_tag(fp, id3);
 
 	fclose(fp);
 
 	return(0);
 }
 
-void id3_print(struct id3 *_id3)
+void id3_print(struct id3 *id3)
 {
 	char genre[1024];
 
-	assert(_id3 != NULL);
+	assert(id3 != NULL);
 
-	id3_get_genre_as_string(_id3, genre);
+	id3_get_genre_as_string(id3, genre);
 
-	printf("Title..: %s\n", _id3->title);
-	printf("Artist.: %s\n", _id3->artist);
-	printf("Album..: %s\n", _id3->album);
-	printf("Year...: %s\n", _id3->year);
-	printf("Comment: %s\n", _id3->comment);
-	printf("Genre..: %s (%d)\n", genre, _id3->genre);
-	printf("Track..: %d\n", _id3->track);
+	printf("Title..: %s\n", id3->title);
+	printf("Artist.: %s\n", id3->artist);
+	printf("Album..: %s\n", id3->album);
+	printf("Year...: %s\n", id3->year);
+	printf("Comment: %s\n", id3->comment);
+	printf("Genre..: %s (%d)\n", genre, id3->genre);
+	printf("Track..: %d\n", id3->track);
 }
 
-int id3_read_tag(const char *_path, char *_tag)
+int id3_read_tag(const char *path, char *tag)
 {
 	FILE *fp;
 	int i;
 	
-	assert(_path != NULL);
-	assert(_tag != NULL);
+	assert(path != NULL);
+	assert(tag != NULL);
 
-	if((fp = fopen(_path, "r")) == NULL)
+	if((fp = fopen(path, "r")) == NULL)
 	        return(-1);
 
 	if(fseek(fp, -1 * TAG_LENGTH, SEEK_END) == -1)
 	        return(-1);
 
 	for(i = 0; i < TAG_LENGTH; i++) {
-		_tag[i] = fgetc(fp);
+		tag[i] = fgetc(fp);
 	}
 
 	fclose(fp);
@@ -116,113 +116,113 @@ int id3_read_tag(const char *_path, char *_tag)
 	return(0);
 }
 
-int id3_write_tag(FILE *_fp, struct id3 *_id3)
+int id3_write_tag(FILE *fp, struct id3 *id3)
 {
-	assert(_fp != NULL);
-	assert(_id3 != NULL);
+	assert(fp != NULL);
+	assert(id3 != NULL);
 
-	fprintf(_fp, "TAG");
-	write_with_padding(_fp, _id3->title, SIZE_INFO);
-	write_with_padding(_fp, _id3->artist, SIZE_INFO);
-	write_with_padding(_fp, _id3->album, SIZE_INFO);
-	write_with_padding(_fp, _id3->year, SIZE_YEAR);
-	write_with_padding(_fp, _id3->comment, SIZE_INFO);
+	fprintf(fp, "TAG");
+	write_with_padding(fp, id3->title, SIZE_INFO);
+	write_with_padding(fp, id3->artist, SIZE_INFO);
+	write_with_padding(fp, id3->album, SIZE_INFO);
+	write_with_padding(fp, id3->year, SIZE_YEAR);
+	write_with_padding(fp, id3->comment, SIZE_INFO);
 
-	if(_id3->track != 0) {
-		fseek(_fp, -1, SEEK_CUR);
-		fprintf(_fp, "%c", _id3->track);
+	if(id3->track != 0) {
+		fseek(fp, -1, SEEK_CUR);
+		fprintf(fp, "%c", id3->track);
 	}
 
-	fprintf(_fp, "%c",   _id3->genre);
+	fprintf(fp, "%c",   id3->genre);
 
 	return(0);
 }
 
-int id3_check_tag(const char *_tag)
+int id3_check_tag(const char *tag)
 {
-	assert(_tag != NULL);
+	assert(tag != NULL);
 
-	if((_tag[0] != 'T') || (_tag[1] != 'A') || (_tag[2] != 'G'))
+	if((tag[0] != 'T') || (tag[1] != 'A') || (tag[2] != 'G'))
 	        return(-1);
 
 	return(0);
 }
 
 
-int id3_extract_info(const char *_tag, struct id3 *_id3)
+int id3_extract_info(const char *tag, struct id3 *id3)
 {
-	assert(_tag != NULL);
-	assert(_id3 != NULL);
+	assert(tag != NULL);
+	assert(id3 != NULL);
 
-	memcpy(_id3->title,   _tag + OFFSET_TITLE,   SIZE_INFO);
-	memcpy(_id3->artist,  _tag + OFFSET_ARTIST,  SIZE_INFO);
-	memcpy(_id3->album,   _tag + OFFSET_ALBUM,   SIZE_INFO);
-	memcpy(_id3->year,    _tag + OFFSET_YEAR,    SIZE_YEAR);
-	memcpy(_id3->comment, _tag + OFFSET_COMMENT, SIZE_INFO);
+	memcpy(id3->title,   tag + OFFSET_TITLE,   SIZE_INFO);
+	memcpy(id3->artist,  tag + OFFSET_ARTIST,  SIZE_INFO);
+	memcpy(id3->album,   tag + OFFSET_ALBUM,   SIZE_INFO);
+	memcpy(id3->year,    tag + OFFSET_YEAR,    SIZE_YEAR);
+	memcpy(id3->comment, tag + OFFSET_COMMENT, SIZE_INFO);
 
-	_id3->track = (_tag[OFFSET_TRACK] == '\0')?0:_tag[OFFSET_TRACK];
-	_id3->genre = _tag[OFFSET_GENRE];
+	id3->track = (tag[OFFSET_TRACK] == '\0')?0:tag[OFFSET_TRACK];
+	id3->genre = tag[OFFSET_GENRE];
 
-	_id3->title[30]   = '\0';
-	_id3->artist[30]  = '\0';
-	_id3->album[30]   = '\0';
-	_id3->year[4]     = '\0';
-	_id3->comment[30] = '\0';
+	id3->title[30]   = '\0';
+	id3->artist[30]  = '\0';
+	id3->album[30]   = '\0';
+	id3->year[4]     = '\0';
+	id3->comment[30] = '\0';
 
 	return(0);
 }
 
-static void remove_trailing_whitespaces(char *_str)
+static void remove_trailing_whitespaces(char *str)
 {
 	int i, size;
 	
-	assert(_str != NULL);
+	assert(str != NULL);
 
-	if(_str == NULL)
+	if(str == NULL)
 	        return;
 	
-	size = strlen(_str);
+	size = strlen(str);
 	
 	for(i = size - 1; i >= 0; i--) {
-		if(_str[i] == ' ') {
-			_str[i] = '\0';
+		if(str[i] == ' ') {
+			str[i] = '\0';
 		} else break;
 	}
 }
 
-void id3_normalize_info(struct id3 *_id3)
+void id3_normalize_info(struct id3 *id3)
 {
-	assert(_id3 != NULL);
+	assert(id3 != NULL);
 
-	remove_trailing_whitespaces(_id3->title);
-	remove_trailing_whitespaces(_id3->artist);
-	remove_trailing_whitespaces(_id3->album);
-	remove_trailing_whitespaces(_id3->comment);
+	remove_trailing_whitespaces(id3->title);
+	remove_trailing_whitespaces(id3->artist);
+	remove_trailing_whitespaces(id3->album);
+	remove_trailing_whitespaces(id3->comment);
 }
 
-void id3_get_genre_as_string(struct id3 *_id3, char *_genre)
+void id3_get_genre_as_string(struct id3 *id3, char *genre)
 {
-	assert(_id3 != NULL);
-	assert(_genre != NULL);
+	assert(id3 != NULL);
+	assert(genre != NULL);
 
-	if(_id3->genre > GENRE_MAX) {
-		strcpy(_genre, "Unknown");
+	if(id3->genre > GENRE_MAX) {
+		strcpy(genre, "Unknown");
 	} else {
-		strcpy(_genre, genres[_id3->genre]);
+		strcpy(genre, genres[id3->genre]);
 	}
 }
 
-static void write_with_padding(FILE *_fp, const char *_str, size_t _len)
+static void write_with_padding(FILE *fp, const char *str, size_t len)
 {
 	unsigned int i;
 
-	assert(_fp != NULL);
-	assert(_str != NULL);
+	assert(fp != NULL);
+	assert(str != NULL);
 
-	fprintf(_fp, "%s", _str);
+	fprintf(fp, "%s", str);
 
-	for(i = 0; i < _len - strlen(_str); i++) {
-		fprintf(_fp, "%c", '\0');
+	for(i = 0; i < len - strlen(str); i++) {
+		fprintf(fp, "%c", '\0');
 	}
 }
 

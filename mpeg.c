@@ -98,12 +98,12 @@ static unsigned long int mpeg_seek_nextheader(FILE *fp);
 	#define ntohl own_ntohl
 #endif
 
-int mpeg_read(const char *path_, struct mpeg *mpeg_)
+int mpeg_read(const char *path, struct mpeg *mpeg)
 {
 	FILE *fp;
 	unsigned long int header;
 
-	if ((fp = fopen(path_, "rb")) == NULL) {
+	if ((fp = fopen(path, "rb")) == NULL) {
 		return(-1);
 	}
 
@@ -111,7 +111,7 @@ int mpeg_read(const char *path_, struct mpeg *mpeg_)
 		return(-1);
 	}
 
-	if(mpeg_extract_info(header, mpeg_) == -1) {
+	if(mpeg_extract_info(header, mpeg) == -1) {
 		return(-1);
 	}
 
@@ -119,63 +119,63 @@ int mpeg_read(const char *path_, struct mpeg *mpeg_)
 	return(0);
 }
 
-int mpeg_extract_info(unsigned long int header_, struct mpeg *mpeg_)
+int mpeg_extract_info(unsigned long int header, struct mpeg *mpeg)
 {
-	if ((header_ & MASK_SYNC) != MASK_SYNC)
+	if ((header & MASK_SYNC) != MASK_SYNC)
 		return(-1);
 
-	mpeg_->mpeg_version = ((header_ & MASK_MPEG) >> SHIFT_MPEG);
+	mpeg->mpeg_version = ((header & MASK_MPEG) >> SHIFT_MPEG);
 
-	mpeg_->layer_desc = ((header_ & MASK_LAYER) >> SHIFT_LAYER);
+	mpeg->layer_desc = ((header & MASK_LAYER) >> SHIFT_LAYER);
 
-	mpeg_->bit_prot = ((header_ & MASK_PROT) >> SHIFT_PROT);
+	mpeg->bit_prot = ((header & MASK_PROT) >> SHIFT_PROT);
 
 	/* causes pain for MPEG_VERSION_2_5 */
-	mpeg_->bitrate = bitrates[(mpeg_->mpeg_version == MPEG_VERSION_1)?0:1][mpeg_->layer_desc - 1][((header_ & MASK_BITRATE) >> SHIFT_BITRATE)];
+	mpeg->bitrate = bitrates[(mpeg->mpeg_version == MPEG_VERSION_1)?0:1][mpeg->layer_desc - 1][((header & MASK_BITRATE) >> SHIFT_BITRATE)];
 
-	switch(mpeg_->mpeg_version)
+	switch(mpeg->mpeg_version)
 	{
 		case MPEG_VERSION_1:
-			mpeg_->freq = freqs[0][((header_ & MASK_FREQ) >> SHIFT_FREQ)];
+			mpeg->freq = freqs[0][((header & MASK_FREQ) >> SHIFT_FREQ)];
 			break;
 		case MPEG_VERSION_2:
-			mpeg_->freq = freqs[1][((header_ & MASK_FREQ) >> SHIFT_FREQ)];
+			mpeg->freq = freqs[1][((header & MASK_FREQ) >> SHIFT_FREQ)];
 			break;
 		case MPEG_VERSION_2_5:
-			mpeg_->freq = freqs[2][((header_ & MASK_FREQ) >> SHIFT_FREQ)];
+			mpeg->freq = freqs[2][((header & MASK_FREQ) >> SHIFT_FREQ)];
 			break;
 	}
 
-	mpeg_->bit_padding = ((header_ & MASK_PADDING) >> SHIFT_PADDING);
+	mpeg->bit_padding = ((header & MASK_PADDING) >> SHIFT_PADDING);
 
-	mpeg_->bit_priv = ((header_ & MASK_PRIV) >> SHIFT_PRIV);
+	mpeg->bit_priv = ((header & MASK_PRIV) >> SHIFT_PRIV);
 
-	mpeg_->chan = (header_ & MASK_CHAN) >> SHIFT_CHAN;
+	mpeg->chan = (header & MASK_CHAN) >> SHIFT_CHAN;
 
-	mpeg_->mode_ext = (header_ & MASK_MODE_EXT) >> SHIFT_MODE_EXT;
+	mpeg->mode_ext = (header & MASK_MODE_EXT) >> SHIFT_MODE_EXT;
 
-	mpeg_->bit_copyright = (header_ & MASK_COPYRIGHT) >> SHIFT_COPYRIGHT;
+	mpeg->bit_copyright = (header & MASK_COPYRIGHT) >> SHIFT_COPYRIGHT;
 
-	mpeg_->bit_orig = (header_ & MASK_ORIG) >> SHIFT_ORIG;
+	mpeg->bit_orig = (header & MASK_ORIG) >> SHIFT_ORIG;
 
-	mpeg_->emphasis = (header_ & MASK_EMPHASIS) >> SHIFT_EMPHASIS;
+	mpeg->emphasis = (header & MASK_EMPHASIS) >> SHIFT_EMPHASIS;
 
 	return(0);
 }
 
-size_t mpeg_frame_length(struct mpeg *mpeg_)
+size_t mpeg_frame_length(struct mpeg *mpeg)
 {
-	int f = (mpeg_->layer_desc == LAYER_VERSION_1)?12:36;
+	int f = (mpeg->layer_desc == LAYER_VERSION_1)?12:36;
 
-	return(f * mpeg_->bitrate * 1000 / mpeg_->freq + mpeg_->bit_padding);
+	return(f * mpeg->bitrate * 1000 / mpeg->freq + mpeg->bit_padding);
 }
 
-size_t mpeg_frame_bytes(struct mpeg *mpeg_)
+size_t mpeg_frame_bytes(struct mpeg *mpeg)
 {
-	return(4 * mpeg_frame_length(mpeg_));
+	return(4 * mpeg_frame_length(mpeg));
 }
 
-void mpeg_print(struct mpeg *mpeg_)
+void mpeg_print(struct mpeg *mpeg)
 {
 	float ver = 0;
 	int layer = 0;
@@ -194,51 +194,51 @@ void mpeg_print(struct mpeg *mpeg_)
 		"CCIT J.17"
 	};
 
-	if (mpeg_->mpeg_version == MPEG_VERSION_1)
+	if (mpeg->mpeg_version == MPEG_VERSION_1)
 		ver = 1;
-	if (mpeg_->mpeg_version == MPEG_VERSION_2)
+	if (mpeg->mpeg_version == MPEG_VERSION_2)
 		ver = 2;
-	if (mpeg_->mpeg_version == MPEG_VERSION_2_5)
+	if (mpeg->mpeg_version == MPEG_VERSION_2_5)
 		ver = 2.5;
 
-	if (mpeg_->layer_desc == LAYER_VERSION_1)
+	if (mpeg->layer_desc == LAYER_VERSION_1)
 		layer = 1;
-	if (mpeg_->layer_desc == LAYER_VERSION_2)
+	if (mpeg->layer_desc == LAYER_VERSION_2)
 		layer = 2;
-	if (mpeg_->layer_desc == LAYER_VERSION_3)
+	if (mpeg->layer_desc == LAYER_VERSION_3)
 		layer = 3;
 
 	printf("MPEG Version %.0f / Layer %s (", ver, layers[layer-1]);
 
-	if (mpeg_->mpeg_version != MPEG_VERSION_2_5)
-		printf("%i KBit/s, ", mpeg_->bitrate);
+	if (mpeg->mpeg_version != MPEG_VERSION_2_5)
+		printf("%i KBit/s, ", mpeg->bitrate);
 
-	printf("%i Hz, ", mpeg_->freq);
+	printf("%i Hz, ", mpeg->freq);
 
-	printf("%s)\n", chan_modes[mpeg_->chan]);
+	printf("%s)\n", chan_modes[mpeg->chan]);
 
 	printf("Mode extension: ");
-	if(mpeg_->chan == CMODE_JOINT_STEREO) {
-		if(mpeg_->layer_desc == LAYER_VERSION_3) {
+	if(mpeg->chan == CMODE_JOINT_STEREO) {
+		if(mpeg->layer_desc == LAYER_VERSION_3) {
 			printf("intensity stereo %s, MS stereo %s\n",
-				((mpeg_->mode_ext==1) || (mpeg_->mode_ext==3))?"on":"off",
-				(mpeg_->mode_ext > 1)?"on":"off"
+				((mpeg->mode_ext==1) || (mpeg->mode_ext==3))?"on":"off",
+				(mpeg->mode_ext > 1)?"on":"off"
 			);
 		} else {
-			printf("bands %d to 31\n", (mpeg_->mode_ext + 1) * 4);
+			printf("bands %d to 31\n", (mpeg->mode_ext + 1) * 4);
 		}
 	} else {
 		printf("no mode extension\n");
 	}
 
-	printf("Emphasis:\t%s\n", emphasis[mpeg_->emphasis]);
-	printf("Protection:\t%s\n", mpeg_->bit_prot?"no":"yes");
-	printf("Padding:\t%s\n", mpeg_->bit_padding?"yes":"no");
-	printf("Private:\t%s\n", mpeg_->bit_priv?"yes":"no");
-	printf("Copyright:\t%s\n", mpeg_->bit_copyright?"yes":"no");
-	printf("Original media:\t%s\n", mpeg_->bit_orig?"yes":"no");
+	printf("Emphasis:\t%s\n", emphasis[mpeg->emphasis]);
+	printf("Protection:\t%s\n", mpeg->bit_prot?"no":"yes");
+	printf("Padding:\t%s\n", mpeg->bit_padding?"yes":"no");
+	printf("Private:\t%s\n", mpeg->bit_priv?"yes":"no");
+	printf("Copyright:\t%s\n", mpeg->bit_copyright?"yes":"no");
+	printf("Original media:\t%s\n", mpeg->bit_orig?"yes":"no");
 	
-	printf("Frame size:\t%d slots (%d bytes)\n", mpeg_frame_length(mpeg_), mpeg_frame_bytes(mpeg_));
+	printf("Frame size:\t%d slots (%d bytes)\n", mpeg_frame_length(mpeg), mpeg_frame_bytes(mpeg));
 }
 
 
