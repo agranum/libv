@@ -23,33 +23,44 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STRING_H_
-#define STRING_H_
 
-char *ltrim(char *const s);
-char *rtrim(char *const s);
-char *trim(char *const s);
-char *substr(const char *s, size_t start, size_t len);
-size_t substr_count(const char *haystack, const char *needle);
-size_t substr_replace_compute_size(const char *haystack,
-				   const char *needle,
-				   const char *replace);
-int substr_index(size_t *pos, const char *haystack, const char *needle);
-void substr_replace_r(      char *s, 
-		      const char *haystack, 
-		      const char *needle, 
-		      const char *replace);
-char *substr_replace(const char *haystack,
-		     const char *needle, 
-		     const char *replace);
-size_t par_size(char ***par);
-int par_add(char ***par, const char *s);
-void par_foreach(char ***par, void func(void *));
-void par_free(char ***par);
-void explode_r(char **a, char *p, const char *str, const char *delim);
-char **explode(const char *str, const char *delim);
-void printstring(void *s);
-int isint(const char *str);
-void str_unify(char *s, const char *chrs, int c);
+#ifndef LIST_H
+#define LIST_H
 
-#endif  /* ! STRING_H_ */
+#define list_get_next_node(list, link) ((link)->next == *(list) ? NULL : (link)->next)
+#define list_get_prev_node(list, link) ((link) == *(list) ? NULL : (link)->prev)
+
+typedef struct node_l node_l;
+struct node_l {
+	node_l *prev;
+	node_l *next;
+	void *data;
+};
+
+typedef struct _data {
+	int n;
+	char str[1024];
+} data;
+
+node_l *list_alloc_node(void *);
+void    list_free_node(node_l *);
+node_l *list_get_first_node(node_l **);
+node_l *list_get_last_node(node_l **);
+void   *list_get_first(node_l **);
+void   *list_get_last(node_l **);
+int     list_prepend(node_l **, void *);
+int     list_append(node_l **, void *);
+void    list_prepend_node(node_l **, node_l *);
+void    list_append_node(node_l **, node_l *);
+void    list_join(node_l **, node_l **);
+int     list_size(node_l **);
+int     list_is_empty(node_l **);
+void    list_foreach(node_l **, void func(void *));
+void    list_unlink(node_l **, node_l *);
+int     list_split(node_l **, node_l **, node_l **);
+node_l *list_pop_first_node(node_l **);
+node_l *list_pop_last_node(node_l **);
+void    list_merge(node_l **, node_l **, node_l **, int cmp(void *, void *));
+void    list_sort(node_l **, int cmp(void *, void *));
+
+#endif  /* ! _LIST_H */
