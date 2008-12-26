@@ -269,10 +269,13 @@ static unsigned long int mpeg_seek_nextheader(FILE *fp)
 	while((c = fgetc(fp)) != 0xff && c != EOF);
 
 	if (feof(fp))
-		return(-1);
+		return -1;
 
 	ungetc(c, fp);
-	fread(&header, 1, sizeof(header), fp);
+
+	if(fread(&header, 1, sizeof(header), fp) != sizeof(header))
+		return -1;
+
 	header = ntohl(header);
 
 	return(header);
@@ -297,5 +300,5 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	return(0);
+	return 0;
 }

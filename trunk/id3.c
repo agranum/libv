@@ -243,6 +243,5 @@ int main()
 	id3_read("sting.mp3", &id3);
 	id3_print(&id3);
 
-	system("PAUSE");
 	return(0);
 }
