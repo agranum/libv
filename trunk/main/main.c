@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
 {
 	int c;
 	int vlevel = 0;
+	extern char *optarg;
+	extern int optind, opterr, optopt;
 
 	opterr = 0;
 	while((c = getopt(argc, argv, ":vh")) != -1) {

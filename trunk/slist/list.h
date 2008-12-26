@@ -23,44 +23,65 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * @file
+ * Linked lists header.
+ * @ingroup lists
+ */
 
-#ifndef LIST_H
-#define LIST_H
-
-#define list_get_next_node(list, link) ((link)->next == *(list) ? NULL : (link)->next)
-#define list_get_prev_node(list, link) ((link) == *(list) ? NULL : (link)->prev)
+#ifndef LIST_H_
+#define LIST_H_
 
 typedef struct node_l node_l;
 struct node_l {
-	node_l *prev;
 	node_l *next;
 	void *data;
 };
 
-typedef struct testdata_ {
+typedef struct testdat_ {
 	int n;
 	char str[1024];
-} testdata;
+} testdat;
 
-node_l *list_alloc_node(void *);
-void    list_free_node(node_l *);
-node_l *list_get_first_node(node_l **);
-node_l *list_get_last_node(node_l **);
-void   *list_get_first(node_l **);
-void   *list_get_last(node_l **);
-int     list_prepend(node_l **, void *);
-int     list_append(node_l **, void *);
-void    list_prepend_node(node_l **, node_l *);
-void    list_append_node(node_l **, node_l *);
-void    list_join(node_l **, node_l **);
-int     list_size(node_l **);
-int     list_is_empty(node_l **);
-void    list_foreach(node_l **, void func(void *));
-void    list_unlink(node_l **, node_l *);
-int     list_split(node_l **, node_l **, node_l **);
-node_l *list_pop_first_node(node_l **);
-node_l *list_pop_last_node(node_l **);
-void    list_merge(node_l **, node_l **, node_l **, int cmp(void *, void *));
-void    list_sort(node_l **, int cmp(void *, void *));
 
-#endif  /* ! _LIST_H */
+int list_push(node_l **x, void *data);
+
+void *list_pop(node_l **x);
+
+int list_move(node_l **dest, node_l **src);
+
+int list_reverse(node_l **x);
+
+node_l *list_sub(const node_l *x, int pos);
+
+int list_insert(node_l **x, int pos, void *data);
+
+void *list_remove(node_l **x, int pos);
+
+void *list_get(const node_l *x, int n);
+
+size_t list_size(const node_l *x);
+
+node_l *list_join(node_l *a, node_l *b);
+
+void list_print(const node_l *a);
+
+int list_split(node_l **src, node_l **front, node_l **back);
+
+int list_merge(node_l **dest, node_l **a, node_l **b, int cmp(void *, void *));
+
+int list_sort(node_l **x, int cmp(void *, void *));
+
+int list_copy(const node_l *src, node_l **dest);
+
+int list_realloc(node_l *x, size_t sz);
+
+int list_dup(node_l *src, node_l **dest, size_t sz);
+
+void list_delete(node_l **x);
+
+void list_destroy(node_l **x);
+
+int list_foreach(node_l *x, int func(void *));
+
+#endif  /* ! LIST_H_ */

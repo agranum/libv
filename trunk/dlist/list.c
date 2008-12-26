@@ -213,9 +213,9 @@ void list_join(node_l **list_a,
 static node_l *list_create_123()
 {
 	node_l *n = NULL;
-	data *a=malloc(sizeof(data)),
-	     *b=malloc(sizeof(data)),
-	     *c=malloc(sizeof(data));
+	testdata *a=malloc(sizeof(testdata)),
+	     *b=malloc(sizeof(testdata)),
+	     *c=malloc(sizeof(testdata));
 
 	a->n = 1;
 	strcpy(a->str, "foo");
@@ -276,7 +276,7 @@ void list_foreach(node_l **list,
 
 static void print_data(void *foo)
 {
-	data *d = (data *)foo;
+	testdata *d = (testdata *)foo;
 
 	printf("%d - %s\n", d->n, d->str);
 }
@@ -453,11 +453,11 @@ int list_copy(node_l **src,
 
 int node_cmp(void *a, void *b)
 {
-	data *x = (data *)a, *y = (data *)b;
+	testdata *lx = (testdata *)a, *ly = (testdata *)b;
 
-	if(x->n < y->n) return(-1);
-	if(x->n == y->n) return(0);
-	if(x->n > y->n) return(1);
+	if(lx->n < ly->n) return(-1);
+	if(lx->n == ly->n) return(0);
+	if(lx->n > ly->n) return(1);
 
 	return(0);
 }
