@@ -23,6 +23,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* Some string functions. */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,7 +32,7 @@
 #include <ctype.h>
 #include "string.h"
 
-
+/* Remove leading whitespaces */
 char *ltrim(char *const s)
 {
 	size_t len;
@@ -51,6 +52,7 @@ char *ltrim(char *const s)
 	return s;
 }
 
+/* Remove trailing whitespaces */
 char *rtrim(char *const s)
 {
 	size_t len;
@@ -69,6 +71,7 @@ char *rtrim(char *const s)
 	return s;
 }
 
+/* Remove leading and trailing whitespaces */
 char *trim(char *const s)
 {
 	rtrim(s);
@@ -77,7 +80,7 @@ char *trim(char *const s)
 	return s;
 }
 
-
+/* return a malloc'd copy of the substring of length len starting at start */
 char *substr(const char *s, size_t start, size_t len)
 {
 	char *d;
@@ -95,7 +98,7 @@ char *substr(const char *s, size_t start, size_t len)
 	return d;
 }
 
-
+/* count occurrences of needle in haystack */
 size_t substr_count(const char *haystack, const char *needle)
 {
 	size_t len, c = 0;
@@ -113,6 +116,8 @@ size_t substr_count(const char *haystack, const char *needle)
 	return c;
 }
 
+/* compute size of the string that results in replacing all occurences
+ * for replace in haystack */
 size_t substr_replace_compute_size(const char *haystack,
 				   const char *needle,
 				   const char *replace)
@@ -128,6 +133,7 @@ size_t substr_replace_compute_size(const char *haystack,
 	return strlen(haystack)  -  m * strlen(needle)  +  m * strlen(replace);
 }
 
+/* saves the integral position of needle within haystack in pos */
 int substr_index(size_t *pos, const char *haystack, const char *needle)
 {
 	char *p;
@@ -148,6 +154,8 @@ int substr_index(size_t *pos, const char *haystack, const char *needle)
 	return 0;
 }
 
+/* replaces all occurences of "needle" for "replace" in "haystack" and copies
+ * the result to "s" */
 void substr_replace_r(      char *s, 
 		      const char *haystack, 
 		      const char *needle, 
@@ -178,6 +186,7 @@ void substr_replace_r(      char *s,
 	strcpy(s, haystack);
 }
 
+/* wrapper for substr_replace_r(), allocates memory accordingly */
 char *substr_replace(const char *haystack,
 		     const char *needle, 
 		     const char *replace)
@@ -258,6 +267,9 @@ void par_free(char ***par)
 	*par = NULL;
 }
 
+/* Computes an array of strings, each of which is a substring of "str" formed
+ * by splitting it on boundaries formed by "delim" and saves the result
+ * in "a" */
 void explode_r(char **a, char *p, const char *str, const char *delim)
 {
 	size_t pos, len_d, i = 0;
@@ -282,6 +294,7 @@ void explode_r(char **a, char *p, const char *str, const char *delim)
 	a[i] = NULL;
 }
 
+/* Wrapper for explode_r(), allocates memory accordingly */
 char **explode(const char *str, const char *delim)
 {
 	size_t len, size;
@@ -308,11 +321,7 @@ char **explode(const char *str, const char *delim)
 	return(p);
 }
 
-void printstring(void *s)
-{
-	printf("---%s---\n", (char *)s);
-}
-
+/* check whether str only contains digits, preceeded by +/- */
 int isint(const char *str)
 {
 	char *p = (char *)str;
@@ -338,6 +347,7 @@ int isint(const char *str)
 	return 1;
 }
 
+/* replaces occurrences of any of the chars in "chrs" with "c" */
 void str_unify(char *s, const char *chrs, int c)
 {
 	char *p = s;

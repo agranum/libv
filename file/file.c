@@ -30,7 +30,7 @@
 #include <string.h>
 #include "file.h"
 
-
+/* UNIX file ending. Might yield funny results on Windows/Mac files. */
 char *file_read_line(FILE *fp)
 {
 	char *ret = NULL;

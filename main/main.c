@@ -23,6 +23,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* Template main function. */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

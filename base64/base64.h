@@ -1,4 +1,4 @@
-/*  Copyright (c) 2006-2007, Philip Busch <broesel@studcs.uni-sb.de>
+/*  Copyright (c) 2006-2008, Philip Busch <philip@0xe3.com>
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
