@@ -1,4 +1,4 @@
-/*  Copyright (c) 2006-2007, Philip Busch <broesel@studcs.uni-sb.de>
+/*  Copyright (c) 2009, Philip Busch <philip@0xe3.com>
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -23,28 +23,76 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DEFINES_H_
-#define DEFINES_H_
 
-/* some useful defines */
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <string.h>
+#include <ctype.h>
+#include <time.h>
+#include <sys/time.h>
+#include "timer.h"
+#include "debug.h"
 
-#if defined(C99)  /* there is no macro C99 */
-#define DEBUG(...) \
-	{ printf("%s:%d:%s(): ", __FILE__, __LINE__, __func__); \
-	  printf(__VA_ARGS__); \
-	  puts(""); }
-#else
-#define DEBUG(msg) \
-	{ printf("%s:%d: ", __FILE__, __LINE__); \
-	  printf msg; \
-	  puts(""); }
-#endif
+timer *timer_init()
+{
+	timer *t = malloc(sizeof(timer));
 
-#define SWAP(a, b)  {a ^= b; b ^= a; a ^= b;}
+	if(t != NULL) {
+		t->user = 0;
+		t->real.tv_sec = 0;
+		t->real.tv_usec = 0;
+	}
 
-#define MAX(a, b) ((a) < (b) ? (b) : (a))
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
+	return t;
+}
 
-#define COMPUTE(e) printf(#e " = %d", e)
+void timer_destroy(timer *t)
+{
+	assert(t != NULL);
 
-#endif /* ! DEFINES_H_ */
+	free(t);
+}
+
+void timer_start(timer *t)
+{
+	assert(t != NULL);
+
+	t->user = clock();
+	gettimeofday(&(t->real), NULL);
+}
+
+void timer_stop(timer *t)
+{
+	struct timeval my_tv;
+
+	assert(t != NULL);
+
+	gettimeofday(&my_tv, NULL);
+
+	t->user = clock() - t->user;
+	t->real.tv_sec  = my_tv.tv_sec  - t->real.tv_sec;
+	t->real.tv_usec = my_tv.tv_usec - t->real.tv_usec;
+}
+
+double timer_get_user(timer *t)
+{
+	assert(t != NULL);
+
+	return((double)t->user / (double)CLOCKS_PER_SEC);
+}
+
+double timer_get_real(timer *t)
+{
+	assert(t != NULL);
+
+	return t->real.tv_sec + t->real.tv_usec / 1000000.;
+}
+
+void timer_print(timer *t)
+{
+	assert(t != NULL);
+
+	printf("real: %f\n", timer_get_real(t));
+	printf("user: %f\n", timer_get_user(t));
+}
