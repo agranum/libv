@@ -1,0 +1,1 @@
+libv is a low-level library implementing common datastructures (single/double linked lists, dynamic arrays, FIFOs, LIFOs), algorithms (MD5, ...) and stuff (ID3 tag reader/parser, base64 en-/decoder, MPEG frame header parser).
